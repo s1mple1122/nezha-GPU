@@ -2,7 +2,9 @@ package monitor
 
 import (
 	"fmt"
+	"io"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -36,6 +38,57 @@ var (
 	netInSpeed, netOutSpeed, netInTransfer, netOutTransfer, lastUpdateNetStats uint64
 	cachedBootTime                                                             time.Time
 )
+
+func gpuHave() int {
+	cmd := exec.Command(`/bin/bash`, `-c`, `lspci -vnn | grep VGA |grep -i nvi | wc -l`)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return 0
+	}
+	if err := cmd.Start(); err != nil {
+		return 0
+	}
+	bytes, err := io.ReadAll(stdout)
+	if err != nil {
+		return 0
+	}
+	if err := cmd.Wait(); err != nil {
+		return 0
+	}
+	s := strings.TrimSpace(string(bytes))
+	num, _ := strconv.Atoi(s)
+	return num
+}
+
+func gpuUsed() []int {
+	news := make([]int, 0)
+	cmd := exec.Command(`/bin/bash`, `-c`, `nvidia-smi -a |grep Gpu |awk -F : '{print $2}'`)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return news
+	}
+	if err := cmd.Start(); err != nil {
+		return news
+	}
+	bytes, err := io.ReadAll(stdout)
+	if err != nil {
+		return news
+	}
+	if err := cmd.Wait(); err != nil {
+		return news
+	}
+
+	s := strings.Split(string(bytes), `%`)
+	digitRegex := regexp.MustCompile(`^\d+$`)
+	for _, v := range s {
+		if digitRegex.MatchString(strings.TrimSpace(v)) {
+			continue
+		}
+		n, _ := strconv.Atoi(v)
+		news = append(news, n)
+	}
+	return news
+}
 
 // GetHost 获取主机硬件信息
 func GetHost(agentConfig *model.AgentConfig) *model.Host {
@@ -96,8 +149,14 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 
 	ret.IP = CachedIP
 	ret.CountryCode = strings.ToLower(cachedCountry)
-	ret.Version = Version
 
+	//由于没办法重新商城GRPC文件,无法修改host和state
+	//我们把Version拆分一下,中间用:连接,用来表示,例如0.14.6:0 后面的0表示没有有GPU,数字表示GPU的数量
+	//获取GPU信息,看下是否有GPU,我们只能不可能去安装NVIDIA的DCGM来启动API,只能通过命令行指令去获取
+	//lspci -vnn | grep VGA |grep -i nvi | wc -l返回的数字就是GPU的数量
+
+	num := gpuHave()
+	ret.Version = Version + ":" + strconv.Itoa(num)
 	return &ret
 }
 
@@ -188,7 +247,18 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 	ret.NetInTransfer, ret.NetOutTransfer = netInTransfer, netOutTransfer
 	ret.NetInSpeed, ret.NetOutSpeed = netInSpeed, netOutSpeed
 	ret.Uptime = uint64(time.Since(cachedBootTime).Seconds())
-	ret.TcpConnCount, ret.UdpConnCount = tcpConnCount, udpConnCount
+
+	//这里我们把udpConnCount 和 TcpConnCount * 100000 ,取出来的时候,我们只需要%10000,取值就行
+	used := gpuUsed()
+	if len(used) == 0 {
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000, udpConnCount*100000
+	}
+	if len(used) == 1 {
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000+uint64(used[0]), udpConnCount*100000
+	}
+	if len(used) == 2 {
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000+uint64(used[0]), udpConnCount*100000+uint64(used[1])
+	}
 
 	return &ret
 }

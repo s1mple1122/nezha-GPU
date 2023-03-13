@@ -27,6 +27,8 @@
                     CPU: @#server.Host.CPU#@<br />
                     {{tr "DiskUsed"}}:
                     @#formatByteSize(server.State.DiskUsed)#@/@#formatByteSize(server.Host.DiskTotal)#@<br />
+                    {{tr "GpuUsed"}}:
+                    @#server.Gpu#@<br />
                     {{tr "MemUsed"}}:
                     @#formatByteSize(server.State.MemUsed)#@/@#formatByteSize(server.Host.MemTotal)#@<br />
                     {{tr "SwapUsed"}}:
@@ -60,6 +62,17 @@
                         <div class="bar"
                           :style="formatPercent(server.live,server.State.MemUsed, server.Host.MemTotal).style">
                           <small>@#parseInt(server.State?server.State.MemUsed/server.Host.MemTotal*100:0)#@%</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="wz-card" v-for="data in server.GpuUsed">
+                      <div class="wz-card-title">{{tr "GpuUsed"}}</div>
+                      <div class="wz-card-content">
+                        <div :class="formatPercent(server.live,data, 100).class">
+                          <div class="bar"
+                               :style="formatPercent(server.live,data, 100).style">
+                            <small>@#data#@%</small>
+                          </div>
                         </div>
                       </div>
                     </div>

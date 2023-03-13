@@ -35,6 +35,36 @@ td {
   max-width: 450px;
 }
 
+.wz-card{
+  width: 100%;
+  padding: 0 !important;
+}
+.wz-card-title {
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 2rem !important;
+  width: 18.75%!important;
+  position: relative;
+  display: inline-block;
+  padding-left: 1rem;
+  vertical-align: top;
+}
+.wz-card-content{
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  height: 2rem !important;
+  width: 80%!important;
+  position: relative;
+  display: inline-block;
+  padding-left: 0.8rem;
+  padding-right: 1rem;
+  vertical-align: top;
+  -webkit-box-direction: normal;
+  color: rgba(0,0,0,.68);
+  font-size: 1em;
+}
+
 .status.cards .flag {
   margin-right: 0 !important;
 }

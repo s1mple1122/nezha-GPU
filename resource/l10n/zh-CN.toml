@@ -379,6 +379,9 @@ other = "系统"
 [DiskUsed]
 other = "硬盘"
 
+[GpuUsed]
+other = "显卡"
+
 [MemUsed]
 other = "内存"
 

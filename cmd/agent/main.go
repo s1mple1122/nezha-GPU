@@ -341,7 +341,7 @@ func handleIcmpPingTask(task *pb.Task, result *pb.TaskResult) {
 		if stat.PacketsRecv == 0 {
 			result.Data = "pockets recv 0"
 			return
-		} 
+		}
 		result.Delay = float32(stat.AvgRtt.Microseconds()) / 1000.0
 		result.Successful = true
 	} else {

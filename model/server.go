@@ -17,10 +17,11 @@ type Server struct {
 	Note         string `json:"-"` // 管理员可见备注
 	DisplayIndex int    // 展示排序，越大越靠前
 	HideForGuest bool   // 对游客隐藏
-
-	Host       *Host      `gorm:"-"`
-	State      *HostState `gorm:"-"`
-	LastActive time.Time  `gorm:"-"`
+	Gpu          uint64
+	GpuUsed      []uint64
+	Host         *Host      `gorm:"-"`
+	State        *HostState `gorm:"-"`
+	LastActive   time.Time  `gorm:"-"`
 
 	TaskClose  chan error                        `gorm:"-" json:"-"`
 	TaskStream pb.NezhaService_RequestTaskServer `gorm:"-" json:"-"`

@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -135,14 +136,29 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 		_, isMember := c.Get(model.CtxKeyAuthorizedUser)
 		_, isViewPasswordVerfied := c.Get(model.CtxKeyViewPasswordVerified)
 
+		var servers1 []*model.Server
 		var servers []*model.Server
-
 		if isMember || isViewPasswordVerfied {
-			servers = singleton.SortedServerList
+			servers1 = singleton.SortedServerList
 		} else {
-			servers = singleton.SortedServerListForGuest
+			servers1 = singleton.SortedServerListForGuest
 		}
 
+		for _, v := range servers1 {
+			vv := strings.Split(v.Host.Version, `:"`)
+			v.Host.Version = vv[0]
+			gn, _ := strconv.Atoi(vv[1])
+			v.Gpu = uint64(gn)
+			v.State.TcpConnCount = v.State.TcpConnCount / 100000
+			v.State.UdpConnCount = v.State.UdpConnCount / 100000
+			if gn == 1 {
+				v.GpuUsed = []uint64{v.State.TcpConnCount % 100000}
+			}
+			if gn == 2 {
+				v.GpuUsed = []uint64{v.State.TcpConnCount % 100000, v.State.UdpConnCount % 100000}
+			}
+			servers = append(servers, v)
+		}
 		return utils.Json.Marshal(Data{
 			Now:     time.Now().Unix() * 1000,
 			Servers: servers,

@@ -60,8 +60,8 @@ func gpuHave() int {
 	return num
 }
 
-func gpuUsed() []int {
-	news := make([]int, 0)
+func gpuUsed() []uint64 {
+	news := make([]uint64, 0)
 	cmd := exec.Command(`/bin/bash`, `-c`, `nvidia-smi -a |grep Gpu |awk -F : '{print $2}'`)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -85,7 +85,7 @@ func gpuUsed() []int {
 			continue
 		}
 		n, _ := strconv.Atoi(v)
-		news = append(news, n)
+		news = append(news, uint64(n))
 	}
 	return news
 }
@@ -150,7 +150,7 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 	ret.IP = CachedIP
 	ret.CountryCode = strings.ToLower(cachedCountry)
 
-	//由于没办法重新商城GRPC文件,无法修改host和state
+	//由于没办法重新生成GRPC文件,无法修改host和state
 	//我们把Version拆分一下,中间用:连接,用来表示,例如0.14.6:0 后面的0表示没有有GPU,数字表示GPU的数量
 	//获取GPU信息,看下是否有GPU,我们只能不可能去安装NVIDIA的DCGM来启动API,只能通过命令行指令去获取
 	//lspci -vnn | grep VGA |grep -i nvi | wc -l返回的数字就是GPU的数量
@@ -248,16 +248,50 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 	ret.NetInSpeed, ret.NetOutSpeed = netInSpeed, netOutSpeed
 	ret.Uptime = uint64(time.Since(cachedBootTime).Seconds())
 
-	//这里我们把udpConnCount 和 TcpConnCount * 100000 ,取出来的时候,我们只需要%10000,取值就行
+	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
 	used := gpuUsed()
 	if len(used) == 0 {
-		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000, udpConnCount*100000
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9, udpConnCount*1e9
 	}
 	if len(used) == 1 {
-		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000+uint64(used[0]), udpConnCount*100000
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9
 	}
 	if len(used) == 2 {
-		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*100000+uint64(used[0]), udpConnCount*100000+uint64(used[1])
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9+used[1]
+	}
+	if len(used) == 3 {
+		one := used[0] * 1e6
+		two := used[1] * 1e3
+		three := used[2]
+		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
+		ret.UdpConnCount = udpConnCount * 1e9
+	}
+	if len(used) == 4 {
+		one := used[0] * 1e6
+		two := used[1] * 1e3
+		three := used[2]
+		four := used[3] * 1e6
+		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
+		ret.UdpConnCount = udpConnCount*1e9 + four
+	}
+	if len(used) == 5 {
+		one := used[0] * 1e6
+		two := used[1] * 1e3
+		three := used[2]
+		four := used[3] * 1e6
+		five := used[4] * 1e3
+		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
+		ret.UdpConnCount = udpConnCount*1e9 + four + five
+	}
+	if len(used) == 6 {
+		one := used[0] * 1e6
+		two := used[1] * 1e3
+		three := used[2]
+		four := used[3] * 1e6
+		five := used[4] * 1e3
+		six := used[5]
+		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
+		ret.UdpConnCount = udpConnCount*1e9 + four + five + six
 	}
 
 	return &ret

@@ -149,14 +149,29 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 			v.Host.Version = vv[0]
 			gn, _ := strconv.Atoi(vv[1])
 			v.Gpu = uint64(gn)
-			v.State.TcpConnCount = v.State.TcpConnCount / 100000
-			v.State.UdpConnCount = v.State.UdpConnCount / 100000
+			num1 := v.State.TcpConnCount
+			num2 := v.State.UdpConnCount
+			v.State.TcpConnCount = v.State.TcpConnCount / 1e9
+			v.State.UdpConnCount = v.State.UdpConnCount / 1e9
 			if gn == 1 {
-				v.GpuUsed = []uint64{v.State.TcpConnCount % 100000}
+				v.GpuUsed = []uint64{num1 % 1e9}
 			}
 			if gn == 2 {
-				v.GpuUsed = []uint64{v.State.TcpConnCount % 100000, v.State.UdpConnCount % 100000}
+				v.GpuUsed = []uint64{num1 % 1e9, num2 % 1e9}
 			}
+			if gn == 3 {
+				v.GpuUsed = []uint64{num1 / 1e6 % 1e3, num1 / 1e3 % 1e3, num1 % 1e3}
+			}
+			if gn == 4 {
+				v.GpuUsed = []uint64{num1 / 1e6 % 1e3, num1 / 1e3 % 1e3, num1 % 1e3, num2 / 1e6 % 1e3}
+			}
+			if gn == 5 {
+				v.GpuUsed = []uint64{num1 / 1e6 % 1e3, num1 / 1e3 % 1e3, num1 % 1e3, num2 / 1e6 % 1e3, num2 / 1e3 % 1e3}
+			}
+			if gn == 6 {
+				v.GpuUsed = []uint64{num1 / 1e6 % 1e3, num1 / 1e3 % 1e3, num1 % 1e3, num2 / 1e6 % 1e3, num2 / 1e3 % 1e3, num2 % 1e3}
+			}
+
 			servers = append(servers, v)
 		}
 		return utils.Json.Marshal(Data{

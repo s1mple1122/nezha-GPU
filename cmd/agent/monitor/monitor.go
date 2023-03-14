@@ -247,34 +247,35 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 	ret.NetInTransfer, ret.NetOutTransfer = netInTransfer, netOutTransfer
 	ret.NetInSpeed, ret.NetOutSpeed = netInSpeed, netOutSpeed
 	ret.Uptime = uint64(time.Since(cachedBootTime).Seconds())
+	//检查有没有GPU
+	count := gpuHave()
+	if count == 0 {
+		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9, udpConnCount*1e9
+		return &ret
+	}
 
 	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
 	used := gpuUsed()
-	if len(used) == 0 {
-		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9, udpConnCount*1e9
-	}
-	if len(used) == 1 {
+
+	switch len(used) {
+	case 1:
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9
-	}
-	if len(used) == 2 {
+	case 2:
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9+used[1]
-	}
-	if len(used) == 3 {
+	case 3:
 		one := used[0] * 1e6
 		two := used[1] * 1e3
 		three := used[2]
 		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
 		ret.UdpConnCount = udpConnCount * 1e9
-	}
-	if len(used) == 4 {
+	case 4:
 		one := used[0] * 1e6
 		two := used[1] * 1e3
 		three := used[2]
 		four := used[3] * 1e6
 		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
 		ret.UdpConnCount = udpConnCount*1e9 + four
-	}
-	if len(used) == 5 {
+	case 5:
 		one := used[0] * 1e6
 		two := used[1] * 1e3
 		three := used[2]
@@ -282,8 +283,7 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 		five := used[4] * 1e3
 		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
 		ret.UdpConnCount = udpConnCount*1e9 + four + five
-	}
-	if len(used) == 6 {
+	case 6:
 		one := used[0] * 1e6
 		two := used[1] * 1e3
 		three := used[2]
@@ -293,7 +293,6 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 		ret.TcpConnCount = tcpConnCount*1e9 + one + two + three
 		ret.UdpConnCount = udpConnCount*1e9 + four + five + six
 	}
-
 	return &ret
 }
 

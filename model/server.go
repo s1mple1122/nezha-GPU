@@ -12,12 +12,12 @@ import (
 type Server struct {
 	Common
 	Name         string
-	Tag          string     // 分组名
-	Secret       string     `gorm:"uniqueIndex" json:"-"`
-	Note         string     `json:"-"` // 管理员可见备注
-	DisplayIndex int        // 展示排序，越大越靠前
-	HideForGuest bool       // 对游客隐藏
-	Gpu          uint64     `gorm:"-"` //忽略字段
+	Tag          string // 分组名
+	Secret       string `gorm:"uniqueIndex" json:"-"`
+	Note         string `json:"-"` // 管理员可见备注
+	DisplayIndex int    // 展示排序，越大越靠前
+	HideForGuest bool   // 对游客隐藏
+	Gpu          uint64
 	GpuUsed      []uint64   `gorm:"-"` //忽略字段
 	Host         *Host      `gorm:"-"`
 	State        *HostState `gorm:"-"`

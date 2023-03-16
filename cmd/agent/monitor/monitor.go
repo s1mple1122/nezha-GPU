@@ -156,7 +156,7 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 	//lspci -vnn | grep VGA |grep -i nvi | wc -l返回的数字就是GPU的数量
 
 	num := gpuHave()
-	ret.Version = Version + ":" + strconv.Itoa(num)
+	ret.Version = Version + "$" + strconv.Itoa(num)
 	return &ret
 }
 

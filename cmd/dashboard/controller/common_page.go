@@ -145,7 +145,7 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 		}
 
 		for _, v := range servers1 {
-			vv := strings.Split(v.Host.Version, `$"`)
+			vv := strings.Split(v.Host.Version, `$`)
 			var gn = 0
 			if len(vv) == 2 {
 				v.Host.Version = vv[0]

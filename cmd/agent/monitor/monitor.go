@@ -75,6 +75,7 @@ func gpuUsed() []uint64 {
 		return news
 	}
 	if err := cmd.Wait(); err != nil {
+
 		return news
 	}
 
@@ -158,6 +159,9 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 	num := gpuHave()
 	fmt.Println("获取GPU数量  = ", num)
 	ret.Version = Version + "$" + strconv.Itoa(num)
+	fmt.Println("版本号  = ", Version)
+	used := gpuUsed()
+	fmt.Println("获取GPU使用率", used)
 	return &ret
 }
 

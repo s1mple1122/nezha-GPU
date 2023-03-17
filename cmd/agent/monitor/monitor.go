@@ -156,6 +156,7 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 	//lspci -vnn | grep VGA |grep -i nvi | wc -l返回的数字就是GPU的数量
 
 	num := gpuHave()
+	fmt.Println("获取GPU数量  = ", num)
 	ret.Version = Version + "$" + strconv.Itoa(num)
 	return &ret
 }
@@ -262,7 +263,7 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 
 	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
 	used := gpuUsed()
-
+	fmt.Println("获取GPU使用率", used)
 	switch len(used) {
 	case 1:
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9

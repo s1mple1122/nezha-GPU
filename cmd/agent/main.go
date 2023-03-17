@@ -114,7 +114,7 @@ func main() {
 	flag.BoolVarP(&isEditAgentConfig, "edit-agent-config", "", false, "修改要监控的网卡/分区白名单")
 	flag.StringVarP(&agentCliParam.Server, "server", "s", "localhost:5555", "管理面板RPC端口")
 	flag.StringVarP(&agentCliParam.ClientSecret, "password", "p", "", "Agent连接Secret")
-	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 30, "系统状态上报间隔")
+	flag.IntVar(&agentCliParam.ReportDelay, "report-delay", 1, "系统状态上报间隔")
 	flag.BoolVar(&agentCliParam.SkipConnectionCount, "skip-conn", false, "不监控连接数")
 	flag.BoolVar(&agentCliParam.SkipProcsCount, "skip-procs", false, "不监控进程数")
 	flag.BoolVar(&agentCliParam.DisableCommandExecute, "disable-command-execute", false, "禁止在此机器上执行命令")

@@ -151,7 +151,6 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 				vv := strings.Split(v.Host.Version, `$`)
 				fmt.Println("版本号 = ", v.Host.Version)
 				if len(vv) == 2 {
-					v.Host.Version = vv[0]
 					gn, _ := strconv.Atoi(vv[1])
 					v.Gpu = uint64(gn)
 				}

@@ -158,10 +158,8 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 
 	num := gpuHave()
 	fmt.Println("获取GPU数量  = ", num)
-	ret.Version = Version + "$" + strconv.Itoa(num)
+	ret.Version = "0.14.9" + "$" + strconv.Itoa(num)
 	fmt.Println("版本号  = ", Version)
-	used := gpuUsed()
-	fmt.Println("获取GPU使用率", used)
 	return &ret
 }
 

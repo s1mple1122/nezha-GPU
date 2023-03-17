@@ -28,10 +28,9 @@ func gpuUsed() []uint64 {
 		return news
 	}
 	if err := cmd.Wait(); err != nil {
-
 		return news
 	}
-
+	fmt.Println("cli执行结果 = ", string(bytes))
 	s := strings.Split(string(bytes), `%`)
 	fmt.Println(s)
 	digitRegex := regexp.MustCompile(`^\d+$`)

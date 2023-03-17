@@ -377,13 +377,13 @@ other = "已离线"
 other = "系统"
 
 [DiskUsed]
-other = "硬盘"
+other = "硬盘1"
 
 [GpuUsed]
 other = "GPU"
 
 [MemUsed]
-other = "内存"
+other = "内存1"
 
 [SwapUsed]
 other = "交换"

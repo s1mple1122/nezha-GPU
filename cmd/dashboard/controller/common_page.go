@@ -156,6 +156,7 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 					v.Gpu = uint64(gn)
 				}
 			} else {
+				fmt.Println("版本号 = ", v.Host.Version)
 				fmt.Println("采集之前就有的历史数据,不做任何操作")
 				servers = append(servers, v)
 				continue

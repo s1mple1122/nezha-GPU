@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"regexp"
@@ -146,17 +147,17 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 
 		for _, v := range servers1 {
 			vv := strings.Split(v.Host.Version, `$`)
+			fmt.Println("版本号 = ", v.Host.Version)
 			var gn = 0
 			if len(vv) == 2 {
 				v.Host.Version = vv[0]
 				gn, _ := strconv.Atoi(vv[1])
 				v.Gpu = uint64(gn)
 			}
-			if v.Gpu > 0 { //说明读取的历史记录,我们给他一个默认值得了
-				v.GpuUsed = make([]uint64, v.Gpu)
-			}
 			num1 := v.State.TcpConnCount
 			num2 := v.State.UdpConnCount
+			fmt.Println("num1= ", num1)
+			fmt.Println("num2= ", num2)
 			if num1 >= 1e9 || num2 >= 1e9 {
 				v.State.TcpConnCount = v.State.TcpConnCount / 1e9
 				v.State.UdpConnCount = v.State.UdpConnCount / 1e9

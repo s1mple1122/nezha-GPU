@@ -268,6 +268,7 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 
 	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
 	used := gpuUsed(count)
+	fmt.Println(used)
 	switch len(used) {
 	case 1:
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9

@@ -146,13 +146,19 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 		}
 
 		for _, v := range servers1 {
-			vv := strings.Split(v.Host.Version, `$`)
-			fmt.Println("版本号 = ", v.Host.Version)
-			var gn = 0
-			if len(vv) == 2 {
-				v.Host.Version = vv[0]
-				gn, _ := strconv.Atoi(vv[1])
-				v.Gpu = uint64(gn)
+			v.Gpu = 0
+			if strings.Contains(v.Host.Version, `$`) {
+				vv := strings.Split(v.Host.Version, `$`)
+				fmt.Println("版本号 = ", v.Host.Version)
+				if len(vv) == 2 {
+					v.Host.Version = vv[0]
+					gn, _ := strconv.Atoi(vv[1])
+					v.Gpu = uint64(gn)
+				}
+			} else {
+				fmt.Println("采集之前就有的历史数据,不做任何操作")
+				servers = append(servers, v)
+				continue
 			}
 			num1 := v.State.TcpConnCount
 			num2 := v.State.UdpConnCount
@@ -161,7 +167,7 @@ func (cp *commonPage) getServerStat(c *gin.Context) ([]byte, error) {
 			if num1 >= 1e9 || num2 >= 1e9 {
 				v.State.TcpConnCount = v.State.TcpConnCount / 1e9
 				v.State.UdpConnCount = v.State.UdpConnCount / 1e9
-				switch gn {
+				switch v.Gpu {
 				case 1:
 					v.GpuUsed = []uint64{num1 % 1e9}
 				case 2:

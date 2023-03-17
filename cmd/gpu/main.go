@@ -33,15 +33,13 @@ func gpuUsed() []uint64 {
 	if err := cmd.Wait(); err != nil {
 		return news
 	}
-	fmt.Println("cli执行结果 = ", string(bytes))
 	s := strings.Split(string(bytes), `%`)
-	fmt.Println(s)
 	digitRegex := regexp.MustCompile(`^\d+$`)
 	for _, v := range s {
-		if digitRegex.MatchString(strings.TrimSpace(v)) {
+		if !digitRegex.MatchString(strings.TrimSpace(v)) {
 			continue
 		}
-		n, _ := strconv.Atoi(v)
+		n, _ := strconv.Atoi(strings.TrimSpace(v))
 		news = append(news, uint64(n))
 	}
 	return news

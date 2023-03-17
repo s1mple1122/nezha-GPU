@@ -85,7 +85,7 @@ func gpuUsed(i int) []uint64 {
 		if digitRegex.MatchString(strings.TrimSpace(v)) {
 			continue
 		}
-		n, _ := strconv.Atoi(v)
+		n, _ := strconv.Atoi(strings.TrimSpace(v))
 		news[k] = uint64(n)
 	}
 	return news
@@ -263,7 +263,6 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 
 	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
 	used := gpuUsed(count)
-	fmt.Println("获取GPU使用率", used)
 	switch len(used) {
 	case 1:
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9+used[0], udpConnCount*1e9

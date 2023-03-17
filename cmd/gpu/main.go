@@ -10,7 +10,10 @@ import (
 )
 
 func main() {
-	gpuUsed()
+	s := gpuUsed()
+	fmt.Println("----------------------------")
+	fmt.Println(s)
+	fmt.Println(len(s))
 }
 
 func gpuUsed() []uint64 {

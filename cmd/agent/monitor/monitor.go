@@ -60,8 +60,8 @@ func gpuHave() int {
 	return num
 }
 
-func gpuUsed(i int) []uint64 {
-	news := make([]uint64, i)
+func gpuUsed() []uint64 {
+	news := make([]uint64, 0)
 	cmd := exec.Command(`/bin/bash`, `-c`, `nvidia-smi -a |grep Gpu |awk -F : '{print $2}'`)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -75,23 +75,16 @@ func gpuUsed(i int) []uint64 {
 		return news
 	}
 	if err := cmd.Wait(); err != nil {
-
 		return news
 	}
-
 	s := strings.Split(string(bytes), `%`)
 	digitRegex := regexp.MustCompile(`^\d+$`)
-	c := 0
 	for _, v := range s {
-		if digitRegex.MatchString(strings.TrimSpace(v)) {
+		if !digitRegex.MatchString(strings.TrimSpace(v)) {
 			continue
 		}
 		n, _ := strconv.Atoi(strings.TrimSpace(v))
-		news[c] = uint64(n)
-		c++
-		if c == i {
-			break
-		}
+		news = append(news, uint64(n))
 	}
 	return news
 }
@@ -267,7 +260,7 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 	}
 
 	//这里我们把udpConnCount 和 TcpConnCount 这2个参数来传递多个参数,前提是used的这个切片里面的每个值都不大于100
-	used := gpuUsed(count)
+	used := gpuUsed()
 	fmt.Println(used)
 	switch len(used) {
 	case 1:

@@ -40,7 +40,7 @@ var (
 )
 
 func gpuHave() int {
-	cmd := exec.Command(`/bin/bash`, `-c`, `lspci -vnn | grep VGA |grep -i nvi | wc -l`)
+	cmd := exec.Command(`/bin/bash`, `-c`, `lspci |grep -i nvi |grep -i "Audio device" |wc -l`)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
 		return 0

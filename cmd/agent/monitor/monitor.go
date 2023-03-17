@@ -61,6 +61,7 @@ func gpuHave() int {
 }
 
 func gpuUsed(i int) []uint64 {
+	fmt.Println(i)
 	news := make([]uint64, i)
 	cmd := exec.Command(`/bin/bash`, `-c`, `nvidia-smi -a |grep Gpu |awk -F : '{print $2}'`)
 	stdout, err := cmd.StdoutPipe()
@@ -86,6 +87,7 @@ func gpuUsed(i int) []uint64 {
 			continue
 		}
 		n, _ := strconv.Atoi(strings.TrimSpace(v))
+		fmt.Println(k)
 		news[k] = uint64(n)
 	}
 	return news

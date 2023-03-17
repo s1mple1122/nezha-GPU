@@ -249,6 +249,12 @@ func GetState(agentConfig *model.AgentConfig, skipConnectionCount bool, skipProc
 	ret.Uptime = uint64(time.Since(cachedBootTime).Seconds())
 	//检查有没有GPU
 	count := gpuHave()
+	if tcpConnCount < 1 {
+		tcpConnCount = 1
+	}
+	if udpConnCount < 1 {
+		udpConnCount = 1
+	}
 	if count == 0 {
 		ret.TcpConnCount, ret.UdpConnCount = tcpConnCount*1e9, udpConnCount*1e9
 		return &ret

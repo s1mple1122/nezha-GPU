@@ -281,7 +281,7 @@ func reportState() {
 				time.Sleep(delayWhenError)
 			}
 			// 每10分钟重新获取一次硬件信息
-			if lastReportHostInfo.Before(time.Now().Add(-1 * time.Minute)) {
+			if lastReportHostInfo.Before(time.Now().Add(-10 * time.Minute)) {
 				lastReportHostInfo = time.Now()
 				client.ReportSystemInfo(context.Background(), monitor.GetHost(&agentConfig).PB())
 			}

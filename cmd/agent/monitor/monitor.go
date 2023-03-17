@@ -155,11 +155,11 @@ func GetHost(agentConfig *model.AgentConfig) *model.Host {
 	//我们把Version拆分一下,中间用:连接,用来表示,例如0.14.6:0 后面的0表示没有有GPU,数字表示GPU的数量
 	//获取GPU信息,看下是否有GPU,我们只能不可能去安装NVIDIA的DCGM来启动API,只能通过命令行指令去获取
 	//lspci -vnn | grep VGA |grep -i nvi | wc -l返回的数字就是GPU的数量
-
+	Version = "0.14.9"
 	num := gpuHave()
 	fmt.Println("获取GPU数量  = ", num)
 	ret.Version = "0.14.9" + "$" + strconv.Itoa(num)
-	fmt.Println("版本号  = ", Version)
+	fmt.Println("版本号  = ", ret.Version)
 	return &ret
 }
 
